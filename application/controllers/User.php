@@ -1,17 +1,23 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 
 class User extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('User_model','user_model');
-		$this->load->library('Jwt','jwt');
+		$this->load->library('Jwt_auth');
+		if (!class_exists('Jwt_auth')) {
+			die('Jwt_auth library not loaded');
+		}
 	}
 
-	public function login(){
+	public function index(){
+		$this->load->view('auth/login');
+	}
+
+	public function login_api(){
+		header('Content-Type: application/json');
 		$json_data_request = json_decode(file_get_contents("php://input"), true);
 		$_POST['email'] = $json_data_request['email'];
 		$_POST['password'] = $json_data_request['password'];
@@ -29,7 +35,8 @@ class User extends CI_Controller {
 		try {
 			$user = $this->user_model->check_user_by_email($email);
 			if ($user && password_verify($password, $user['password'])) {
-				$token = $this->jwt->generate_jwt($user);
+				$this->load->library('Jwt_auth');
+				$token = $this->jwt_auth->generate_jwt($user);
 				echo json_encode(array(
 					'status' => true,
 					'message' => 'Login successful.',
@@ -51,7 +58,8 @@ class User extends CI_Controller {
 		}
 	}
 
-	public function register(){
+	public function register_api(){
+		header('Content-Type: application/json');
 		$json_data_request = json_decode(file_get_contents("php://input"), true);
 		$_POST['first_name'] = $json_data_request['first_name'];
 		$_POST['last_name'] = $json_data_request['last_name'];
@@ -61,14 +69,13 @@ class User extends CI_Controller {
 
 		extract($_POST);
 
-		$existingUser = $this->user_model->check_user_exist($data['email']);
+		$existingUser = $this->user_model->check_user_exist($email);
 		if ($existingUser) {
 			echo json_encode(array(
 				'status' => 'error',
 				'message' => 'Email already exists. Please use a different email.',
 				'result' => []
 			));
-			echo json_encode($response);
 			return;
 		}
 
@@ -77,22 +84,28 @@ class User extends CI_Controller {
 			'first_name' => $first_name,
 			'last_name' => $last_name,
 			'mobile' => $mobile,
-			'password' => $password,
+			'password' => password_hash($password, PASSWORD_BCRYPT),
+			'status' => 1
 		);
 
-		$response = $this->user_model->register_user($userData);
+		$response = $this->user_model->insert_user($userData);
 		try {
 			if (!empty($response)) {
 				echo json_encode(array(
 					'status' => true,
 					'message' => 'Registration successful.',
-					'result' => $response
+					'result' => array(
+						'email' => $email,
+						'first_name' => $first_name,
+						'last_name' => $last_name,
+						'mobile' => $mobile,
+					)
 				));
 			} else {
 				echo json_encode(array(
 					'status' => false,
 					'message' => 'Registration Un-successful.',
-					'result' => []
+					'result' => ''
 				));
 			}
 		}catch (Exception $e){
@@ -104,7 +117,52 @@ class User extends CI_Controller {
 		}
 	}
 
-	public function change_password(){
+	public function change_password_api(){
+		header('Content-Type: application/json');
+		$json_data_request = json_decode(file_get_contents("php://input"), true);
+		$_POST['id'] = $json_data_request['id'];
+		$_POST['old_password'] = $json_data_request['old_password'];
+		$_POST['new_password'] = $json_data_request['new_password'];
 
+		extract($_POST);
+
+		if(empty($new_password) && empty($old_password)){
+			echo json_encode(array(
+				'status' => 'fail',
+				'message' => 'Old Password and New Password field is required.!',
+				'result' => []
+			));
+			return ;
+		}
+		try {
+			$user = $this->user_model->get_user_info($id);
+			if ($user && password_verify($old_password, $user['password'])) {
+				$data = array(
+					'password' => password_hash($new_password, PASSWORD_BCRYPT)
+				);
+
+				$this->user_model->update_password($id,$data);
+
+				echo json_encode(array(
+					'status' => true,
+					'message' => 'Password Updated successful.',
+					'result' => []
+				));
+			} else {
+				echo json_encode(array(
+					'status' => false,
+					'message' => 'User Not Not existed..',
+					'result' => []
+				));
+			}
+		}catch (Exception $e){
+			echo json_encode(array(
+				'status' => false,
+				'message' => 'Request failed due to.',
+				'result' => $e
+			));
+		}
 	}
 }
+
+?>
