@@ -12,9 +12,17 @@ class User extends CI_Controller {
 		}
 	}
 
+	//ALL Pages
 	public function index(){
-		$this->load->view('auth/login');
+		$data['title'] = 'Login';
+		$this->load->view('auth/login',$data);
 	}
+
+	public function register(){
+		$data['title'] = 'Register';
+		$this->load->view('auth/register', $data);
+	}
+	//ALL APIS
 
 	public function login_api(){
 		header('Content-Type: application/json');
@@ -26,7 +34,7 @@ class User extends CI_Controller {
 
 		if(empty($email) && empty($password)){
 			echo json_encode(array(
-				'status' => 'fail',
+				'status' => false,
 				'message' => 'Email and Password field is required.!',
 				'result' => []
 			));
@@ -72,7 +80,7 @@ class User extends CI_Controller {
 		$existingUser = $this->user_model->check_user_exist($email);
 		if ($existingUser) {
 			echo json_encode(array(
-				'status' => 'error',
+				'status' => false,
 				'message' => 'Email already exists. Please use a different email.',
 				'result' => []
 			));
@@ -128,7 +136,7 @@ class User extends CI_Controller {
 
 		if(empty($new_password) && empty($old_password)){
 			echo json_encode(array(
-				'status' => 'fail',
+				'status' => false,
 				'message' => 'Old Password and New Password field is required.!',
 				'result' => []
 			));

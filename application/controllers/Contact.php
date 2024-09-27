@@ -8,6 +8,11 @@ class Contact extends CI_Controller {
 		$this->load->model('Contact_model','contact_model');
 	}
 
+	public function index(){
+		$data['title'] = 'Contact Us';
+		$this->load->view('contact/contact_us',$data);
+	}
+
 	public function contact_request(){
 		$json_data_request = json_decode(file_get_contents("php://input"), true);
 		$_POST['email'] = $json_data_request['email'];
