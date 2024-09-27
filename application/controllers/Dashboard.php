@@ -16,4 +16,9 @@ class Dashboard extends CI_Controller {
 		$data['title'] = 'Change Password';
 		$this->load->view('dashboard/change_pass',$data);
 	}
+
+	public function product(){
+		$data['title'] = 'Product List';
+		$this->load->view('dashboard/product',$data);
+	}
 }

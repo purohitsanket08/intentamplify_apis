@@ -36,7 +36,7 @@
 	<div class="collapse navbar-collapse" id="navbarNav">
 		<ul class="navbar-nav mr-auto">
 			<li class="nav-item"><a class="nav-link" href="<?= base_url().'contact'; ?>">Get in Touch</a></li>
-			<li class="nav-item"><a class="nav-link" href="#payment">Payment</a></li>
+			<li class="nav-item"><a class="nav-link" href="<?= base_url().'dashboard/product'; ?>">Payment</a></li>
 		</ul>
 		<ul class="navbar-nav ml-auto">
 			<?php if ($this->uri->segment(1) == 'dashboard'): ?>
