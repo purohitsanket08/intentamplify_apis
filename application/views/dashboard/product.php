@@ -8,8 +8,8 @@
 				<div class="card mb-4">
 					<img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Product Image">
 					<div class="card-body">
-						<h5 class="card-title">Product Title</h5>
-						<p class="card-text">This is a brief description of the product. It highlights key features and benefits.</p>
+						<h5 class="card-title">ABCD</h5>
+						<p class="card-text">sampleellelen jnjnadjasjd</p>
 						<p class="card-text"><strong>Price: ₹999</strong></p>
 						<input type="hidden" class="form-control" id="product_id" name="product_id" value="12">
 						<input type="hidden" class="form-control" id="amount" name="amount" value="999">
