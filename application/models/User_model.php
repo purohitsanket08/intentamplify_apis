@@ -31,9 +31,8 @@
 
 		public function update_password($user_id, $data) {
 			$this->db->where('id', $user_id);
-			return $this->db->update('users', $data); // Make sure 'users' is your table name
+			return $this->db->update('users', $data);
 		}
-
 	}
 
 ?>

@@ -6,6 +6,7 @@ class User extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		$this->load->model('User_model','user_model');
+		$this->load->model('Product_model','product_model');
 		$this->load->library('Jwt_auth');
 		if (!class_exists('Jwt_auth')) {
 			die('Jwt_auth library not loaded');
@@ -160,6 +161,57 @@ class User extends CI_Controller {
 				echo json_encode(array(
 					'status' => false,
 					'message' => 'User Not Not existed..',
+					'result' => []
+				));
+			}
+		}catch (Exception $e){
+			echo json_encode(array(
+				'status' => false,
+				'message' => 'Request failed due to.',
+				'result' => $e
+			));
+		}
+	}
+
+	public function payment_success(){
+		header('Content-Type: application/json');
+		$json_data_request = json_decode(file_get_contents("php://input"), true);
+		$_POST['id'] = $json_data_request['id'];
+		$_POST['order_id'] = "jdhjahjhhadh";
+		$_POST['payment_id'] = $json_data_request['payment_id'];
+		$_POST['amount'] = $json_data_request['amount'];
+		$_POST['product_id'] = $json_data_request['product_id'];
+		$_POST['status'] = $json_data_request['status'];
+
+		extract($_POST);
+
+		if(empty($id) && empty($order_id) && empty($payment_id) && empty($amount) && empty($product_id)){
+			echo json_encode(array(
+				'status' => false,
+				'message' => 'request field is missing.!',
+				'result' => []
+			));
+			return ;
+		}
+		try {
+			$payment_info = array(
+				'user_id' => $id,
+				'order_id' => $order_id,
+				'payment_id' => $payment_id,
+				'amount' => $amount,
+				'status' => $status
+			);
+			$response = $this->product_model->insert_payment_voucher($payment_info);
+			if ($response) {
+				echo json_encode(array(
+					'status' => true,
+					'message' => 'Purchase successful.',
+					'result' => ['order_id' => $response]
+				));
+			} else {
+				echo json_encode(array(
+					'status' => false,
+					'message' => 'failed',
 					'result' => []
 				));
 			}
