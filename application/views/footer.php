@@ -7,7 +7,7 @@
 
 	$(document).ready(function() {
 		var token = localStorage.getItem('authToken');
-		if('<?= $this->uri->segment(1); ?>' == 'user') {
+		if('<?= $this->uri->segment(1); ?>' == 'user' || '<?= $this->uri->segment(1); ?>' == '') {
 			if (token) {
 				window.location.href = '<?= base_url()?>dashboard';
 			}
